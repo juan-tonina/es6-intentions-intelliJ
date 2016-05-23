@@ -1,0 +1,55 @@
+<idea-plugin version="2">
+    <id>com.juanpany.es6.intentions</id>
+    <name>Es6 intentions</name>
+    <version>0.1</version>
+    <vendor email="juanf.tonina@gmail.com">Juan</vendor>
+
+    <description><![CDATA[
+      ES6 custom actions. <br>
+    ]]></description>
+
+    <change-notes><![CDATA[
+      This is a proof of concept, use at your own risk!<br>
+      Possible outcomes are: stupid code, broken code, fire, death.<br>
+      This first beta version has a simple convert to/from arrow function for javascript files. Just select a function
+      or arrow function and go to refactor > convert [to|from] arrow function or press ctrl + alt [+ shift] + a on
+      default windows keymap.<br>
+
+    ]]>
+    </change-notes>
+
+    <!-- please see< https://confluence.jetbrains.com/display/IDEADEV/Build+Number+Ranges> for description -->
+    <idea-version since-build="131"/>
+
+    <!-- please see https://confluence.jetbrains.com/display/IDEADEV/Plugin+Compatibility+with+IntelliJ+Platform+Products
+         on how to target different products -->
+    <!-- uncomment to enable plugin in all products
+    -->
+    <depends>com.intellij.modules.lang</depends>
+
+    <extensions defaultExtensionNs="com.intellij">
+        <!-- Add your extensions here -->
+    </extensions>
+
+    <application-components>
+        <!-- Add your application components here -->
+        <component>
+            <implementation-class>CustomEs6Intentions</implementation-class>
+        </component>
+    </application-components>
+
+    <project-components>
+        <!-- Add your project components here -->
+    </project-components>
+
+    <actions>
+        <!-- Add your actions here -->
+        <action id="ConvertFromArrow" class="ConvertFromArrow" text="ConvertFromArrow">
+            <keyboard-shortcut first-keystroke="control alt A" keymap="$default"/>
+        </action>
+        <action id="ConvertToArrow" class="ConvertToArrow" text="Convert to arrow function">
+            <keyboard-shortcut keymap="$default" first-keystroke="shift ctrl alt A"/>
+        </action>
+    </actions>
+
+</idea-plugin>
