@@ -1,9 +1,10 @@
 /**
- * Created by Juan on 23/05/2016.
+ * Created by Juan on 23/05/2016
  */
 
 class CodeBlockCheck {
     private String selectedText;
+    private boolean openRegex;
 
     CodeBlockCheck(String selectedText) {
         this.selectedText = selectedText;
@@ -21,7 +22,7 @@ class CodeBlockCheck {
         boolean multiLineStop = false;
         boolean doubleStop = false;
         boolean singleLineStop = false;
-
+        boolean regexStop = false;
 
 
         char[] chars = selectedText.toCharArray();
@@ -50,9 +51,17 @@ class CodeBlockCheck {
                         singleStop = !singleStop;
                     }
                     break;
-                // Stop counting when a comment opens
+                // Stop counting when a comment or regex opens
                 case '/':
-                    if (i + 1 < chars.length)
+                    if (!stopCount && i > 0 && isOpenRegex(chars, i)) {
+                        stopCount = true;
+                        regexStop = true;
+                    } else if (regexStop) {
+                        if (chars[i - 1] != '\\') {
+                            regexStop = false;
+                            stopCount = false;
+                        }
+                    } else if (i + 1 < chars.length) {
                         if (chars[i + 1] == '/' && !singleStop && !doubleStop) {
                             stopCount = true;
                             singleLineStop = true;
@@ -64,6 +73,7 @@ class CodeBlockCheck {
                             multiLineStop = false;
                             stopCount = false;
                         }
+                    }
                     break;
                 // Continue counting when a line breaks outside a string or comment
                 case '\n':
@@ -88,5 +98,42 @@ class CodeBlockCheck {
             }
         }
         return leftBalance == 0 && selectedText.substring(i).matches("(\\s|;)*");
+    }
+
+    /**
+     * @param chars charArray
+     * @param i     current "/" position
+     * @return if it is opening a regex
+     */
+    private boolean isOpenRegex(char[] chars, int i) {
+        boolean result = false;
+
+        for (i -= 1; i > 0; i--) {
+            if (chars[i] == '\n') {
+                result = true;
+                break;
+            } else {
+                if (!Character.isWhitespace(chars[i])) {
+
+                    if (chars[i] == '}' ||
+                            chars[i] == '=' ||
+                            chars[i] == ';' ||
+                            chars[i] == ':' ||
+                            chars[i] == ',' ||
+                            chars[i] == '+' ||
+                            chars[i] == '-' ||
+                            chars[i] == '*') {
+
+                        result = true;
+                        break;
+
+                    } else {
+                        break;
+                    }
+                }
+            }
+        }
+        return result;
+
     }
 }
