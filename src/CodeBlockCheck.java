@@ -53,15 +53,7 @@ class CodeBlockCheck {
                     break;
                 // Stop counting when a comment or regex opens
                 case '/':
-                    if (!stopCount && i > 0 && isOpenRegex(chars, i)) {
-                        stopCount = true;
-                        regexStop = true;
-                    } else if (regexStop) {
-                        if (chars[i - 1] != '\\') {
-                            regexStop = false;
-                            stopCount = false;
-                        }
-                    } else if (i + 1 < chars.length) {
+                    if (i + 1 < chars.length) {
                         if (chars[i + 1] == '/' && !singleStop && !doubleStop) {
                             stopCount = true;
                             singleLineStop = true;
@@ -72,6 +64,15 @@ class CodeBlockCheck {
                         } else if (multiLineStop && chars[i - 1] == '*') {
                             multiLineStop = false;
                             stopCount = false;
+                        }
+                        else if (!stopCount && i > 0 && isOpenRegex(chars, i)) {
+                            stopCount = true;
+                            regexStop = true;
+                        } else if (regexStop) {
+                            if (chars[i - 1] != '\\') {
+                                regexStop = false;
+                                stopCount = false;
+                            }
                         }
                     }
                     break;
