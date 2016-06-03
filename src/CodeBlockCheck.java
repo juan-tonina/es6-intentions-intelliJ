@@ -123,6 +123,9 @@ class CodeBlockCheck {
                             chars[i] == ',' ||
                             chars[i] == '+' ||
                             chars[i] == '-' ||
+                            chars[i] == '!' ||
+                            chars[i] == '|' ||
+                            chars[i] == '&' ||
                             chars[i] == '*') {
 
                         result = true;
