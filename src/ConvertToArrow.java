@@ -13,6 +13,8 @@ import com.intellij.psi.PsiElement;
 import com.intellij.psi.PsiFile;
 import com.intellij.psi.PsiFileFactory;
 
+import java.util.Objects;
+
 public class ConvertToArrow extends AnAction {
     public ConvertToArrow() {
         // Set the menu item name.
@@ -30,20 +32,22 @@ public class ConvertToArrow extends AnAction {
         PsiElement psiElement = psiFile.findElementAt(caret.getOffset());
 
 
-        while (!psiElement.getText().startsWith("function")) {
+        while (psiElement != null && (!psiElement.getText().startsWith("function") || psiElement.getText().equals("function"))) {
             psiElement = psiElement.getParent();
         }
 
         String text = psiElement.getText();
         text = text.replaceFirst("function", "");
 
-        text = text.replaceFirst("\\)", ") =>");
+        if (text.trim().startsWith("(")) {
+            text = text.replaceFirst("\\)", ") =>");
 
-        PsiFile fileFromText = PsiFileFactory.getInstance(project).createFileFromText(text, psiFile);
+            PsiFile fileFromText = PsiFileFactory.getInstance(project).createFileFromText(text, psiFile);
 
-        PsiElement finalPsiElement = psiElement;
-        Runnable runnable = () -> finalPsiElement.replace(fileFromText.getLastChild());
-        WriteCommandAction.runWriteCommandAction(project, runnable);
+            PsiElement finalPsiElement = psiElement;
+            Runnable runnable = () -> finalPsiElement.replace(fileFromText.getLastChild());
+            WriteCommandAction.runWriteCommandAction(project, runnable);
+        }
 
     }
 

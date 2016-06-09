@@ -11,7 +11,7 @@
     <change-notes><![CDATA[
       This is a proof of concept, use at your own risk!<br>
       Possible outcomes are: stupid code, broken code, fire, death.<br>
-      This first beta version has a simple convert to/from arrow function for javascript files. Just select a function
+      This first beta version has a simple convert to/from arrow function for javascript files. Put your caret on a function
       or arrow function and go to refactor > convert [to|from] arrow function or press ctrl + alt [+ shift] + a on
       default windows keymap.<br>
 
