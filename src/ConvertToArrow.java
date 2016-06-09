@@ -13,8 +13,11 @@ import com.intellij.openapi.ui.popup.JBPopupFactory;
 import com.intellij.openapi.vfs.VirtualFile;
 import com.intellij.openapi.wm.StatusBar;
 import com.intellij.openapi.wm.WindowManager;
+import com.intellij.psi.*;
+import com.intellij.refactoring.RefactoringFactory;
 import com.intellij.ui.JBColor;
 import com.intellij.ui.awt.RelativePoint;
+import com.jgoodies.common.base.Objects;
 
 public class ConvertToArrow extends AnAction {
     public ConvertToArrow() {
@@ -28,45 +31,31 @@ public class ConvertToArrow extends AnAction {
         Caret caret = event.getData(PlatformDataKeys.CARET);
         final Editor editor = event.getData(PlatformDataKeys.EDITOR);
         Document document = editor.getDocument();
+        PsiFile psiFile = PsiDocumentManager.getInstance(project).getPsiFile(document);
+
+        PsiElement psiElement = psiFile.findElementAt(caret.getOffset());
 
 
-        String selectedText = null;
-        if (caret != null) {
-            selectedText = caret.getSelectedText();
+        while (!psiElement.getText().startsWith("function")) {
+            psiElement = psiElement.getParent();
         }
 
-        if (selectedText != null && selectedText.length() > 11) {
-            if (selectedText.matches("\\s*function\\s*\\([\\w,\\s]*\\)\\s*\\{(.*\n?)*\\}\\s*")) {
-                boolean isCodeBlock = new CodeBlockCheck(selectedText).invoke();
-                if (isCodeBlock) {
-                    int functionLength = 8; // Yeah...
-                    int selectionStart = caret.getSelectionStart();
-                    int functionIndex = selectedText.indexOf("function");
-                    String params = selectedText.substring(functionIndex + functionLength, selectedText.indexOf(')') + 1);
-                    int paramsIndex = editor.getDocument().getText().indexOf(params, selectionStart);
-                    Runnable runnable = () -> document.replaceString(selectionStart, paramsIndex + params.length(), (params.indexOf('(') != -1 ? params.trim() + " =>" : "(" + params.trim() + ") =>"));
-                    WriteCommandAction.runWriteCommandAction(project, runnable);
+        String text = psiElement.getText();
+        text = text.replaceFirst("function", "");
 
-                    // Show balloon message
-                    StatusBar statusBar = WindowManager.getInstance()
-                            .getStatusBar(PlatformDataKeys.PROJECT.getData(event.getDataContext()));
-                    JBPopupFactory.getInstance().createHtmlTextBalloonBuilder("Converted to arrow function! Whooosh! Magic!", null, JBColor.CYAN, null)
-                            .setFadeoutTime(5500)
-                            .createBalloon()
-                            .show(RelativePoint.getCenterOf(statusBar.getComponent()),
-                                    Balloon.Position.atRight);
-                }
+        text = text.replaceFirst("\\)", ") =>");
 
-            }
-        } else {
-            Messages.showMessageDialog(project, "My super algorithm does not recognize this as a function",
-                    "Nope", Messages.getErrorIcon());
-        }
+        PsiFile fileFromText = PsiFileFactory.getInstance(project).createFileFromText(text, psiFile);
+
+        PsiElement finalPsiElement = psiElement;
+        Runnable runnable = () -> finalPsiElement.replace(fileFromText.getLastChild());
+        WriteCommandAction.runWriteCommandAction(project, runnable);
 
     }
 
     /**
      * This is mostly duplicated, but let's pretend it is not
+     *
      * @param e some action event from which we get the project, data context and file language
      */
     public void update(AnActionEvent e) {
