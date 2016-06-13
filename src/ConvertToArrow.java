@@ -36,17 +36,19 @@ public class ConvertToArrow extends AnAction {
             psiElement = psiElement.getParent();
         }
 
-        String text = psiElement.getText();
-        text = text.replaceFirst("function", "");
+        if (psiElement != null) {
+            String text = psiElement.getText();
+            text = text.replaceFirst("function", "");
 
-        if (text.trim().startsWith("(")) {
-            text = text.replaceFirst("\\)", ") =>");
+            if (text.trim().startsWith("(")) {
+                text = text.replaceFirst("\\)", ") =>");
 
-            PsiFile fileFromText = PsiFileFactory.getInstance(project).createFileFromText(text, psiFile);
+                PsiFile fileFromText = PsiFileFactory.getInstance(project).createFileFromText(text, psiFile);
 
-            PsiElement finalPsiElement = psiElement;
-            Runnable runnable = () -> finalPsiElement.replace(fileFromText.getLastChild());
-            WriteCommandAction.runWriteCommandAction(project, runnable);
+                PsiElement finalPsiElement = psiElement;
+                Runnable runnable = () -> finalPsiElement.replace(fileFromText.getLastChild());
+                WriteCommandAction.runWriteCommandAction(project, runnable);
+            }
         }
 
     }
