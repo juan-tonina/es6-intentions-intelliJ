@@ -7,14 +7,11 @@ import com.intellij.openapi.editor.Document;
 import com.intellij.openapi.editor.Editor;
 import com.intellij.openapi.fileTypes.LanguageFileType;
 import com.intellij.openapi.project.Project;
-import com.intellij.openapi.ui.Messages;
-import com.intellij.openapi.ui.popup.Balloon;
-import com.intellij.openapi.ui.popup.JBPopupFactory;
 import com.intellij.openapi.vfs.VirtualFile;
-import com.intellij.openapi.wm.StatusBar;
-import com.intellij.openapi.wm.WindowManager;
-import com.intellij.ui.JBColor;
-import com.intellij.ui.awt.RelativePoint;
+import com.intellij.psi.PsiDocumentManager;
+import com.intellij.psi.PsiElement;
+import com.intellij.psi.PsiFile;
+import com.intellij.psi.PsiFileFactory;
 
 public class ConvertFromArrow extends AnAction {
     public ConvertFromArrow() {
@@ -28,139 +25,44 @@ public class ConvertFromArrow extends AnAction {
         Caret caret = event.getData(PlatformDataKeys.CARET);
         final Editor editor = event.getData(PlatformDataKeys.EDITOR);
         Document document = editor.getDocument();
+        PsiFile psiFile = PsiDocumentManager.getInstance(project).getPsiFile(document);
+
+        PsiElement psiElement = psiFile.findElementAt(caret.getOffset());
 
 
-        String selectedText = null;
-        if (caret != null) {
-            selectedText = caret.getSelectedText();
+        // I'm SURE that there is a better way of doing this... but again, I'm usually wrong
+        while (psiElement != null &&
+                !(psiElement.getNode() != null &&
+                        psiElement.getNode().getElementType().toString().equals("JS:FUNCTION_EXPRESSION") &&
+                        !psiElement.getText().startsWith("function"))) {
+            psiElement = psiElement.getParent();
         }
 
-        if (selectedText != null && selectedText.length() > 3) {
-            if (selectedText.matches("((\\s*\\([\\w,\\s]*\\)\\s*=>)|([\\w\\s]*\\s*=>))\\s*\\{(.*\n?)*\\}\\s*")) {
-                boolean isCodeBlock = new CodeBlockCheck(selectedText).invoke();
-                if (isCodeBlock) {
-                    replaceOnMethod(event, project, caret, editor, document, selectedText, false);
-                }
-
-            } else if (selectedText.matches("((\\s*\\([\\w,\\s]*\\)\\s*=>)|([\\w\\s]*\\s*=>))(.|\\s)*")) {
-                char[] chars = selectedText.toCharArray();
-
-
-                boolean doubleQuotes = false;
-                boolean singleQuotes = false;
-                int curlyBrackets = 0;
-                int squareBrackets = 0;
-                int brackets = 0;
-
-                int i;
-                // I'm so sorry for the following label
-                loop:
-                for (i = 0; i < chars.length; i++) {
-
-                    switch (chars[i]) {
-                        case '"':
-                            if (!singleQuotes) {
-                                doubleQuotes = !doubleQuotes;
-                            }
-                            break;
-                        case '\'':
-                            if (!doubleQuotes) {
-                                singleQuotes = !singleQuotes;
-                            }
-                            break;
-                        case '{':
-                            if (!doubleQuotes && !singleQuotes) {
-                                ++curlyBrackets;
-                            }
-                            break;
-                        case '}':
-                            if (!doubleQuotes && !singleQuotes) {
-                                --curlyBrackets;
-                            }
-                            break;
-                        case '[':
-                            if (!doubleQuotes && !singleQuotes) {
-                                ++squareBrackets;
-                            }
-                            break;
-                        case ']':
-                            if (!doubleQuotes && !singleQuotes) {
-                                --squareBrackets;
-                            }
-                            break;
-                        case '(':
-                            if (!doubleQuotes && !singleQuotes) {
-                                ++brackets;
-                            }
-                            break;
-                        case ')':
-                            if (!doubleQuotes && !singleQuotes) {
-                                --brackets;
-                            }
-                            break;
-                        case '\n':
-                            if (!doubleQuotes && !singleQuotes && brackets == 0 && squareBrackets == 0 && curlyBrackets == 0) {
-                                // You know... in case someone is splitting a string with a plus sign in the middle of an
-                                //  arrow function without curly brackets... The little specific f*cker
-                                if (i > 0 && chars[i - 1] != '+') {
-
-                                    break loop; // HAHA! No one expects a "break something"
-                                }
-                            }
-                            break;
-                        case ';':
-                            if (!doubleQuotes && !singleQuotes && brackets == 0 && squareBrackets == 0 && curlyBrackets == 0) {
-                                break loop; // HAHA! No one expects a (two) "break something"(s)
-                            }
-                            break;
-
-                    }
-
-                }
-                if (selectedText.substring(i).matches("\\s*;?")) {
-                    replaceOnMethod(event, project, caret, editor, document, selectedText, true);
-                }
-
-
-            }
-        } else {
-            Messages.showMessageDialog(project, "My super algorithm does not recognize this as an arrow function",
-                    "Nope", Messages.getErrorIcon());
-        }
-
-    }
-
-    private void replaceOnMethod(AnActionEvent event, Project project, Caret caret, Editor editor, Document document, String selectedText, boolean addReturnAndBrackets) {
-        int selectionStart = caret.getSelectionStart();
-        int arrowIndex = selectedText.indexOf("=>");
-        int arrowGlobalIndex = editor.getDocument().getText().indexOf("=>", selectionStart);
-        String params = selectedText.substring(0, arrowIndex);
-        Runnable runnable = () -> {
-            int arrowLength = 2; // Yeah...
-            String charSequence;
-            if (addReturnAndBrackets) {
-                charSequence = "function" + (params.indexOf('(') != -1 ? params.trim() + "{ return " : "(" + params.trim() + ") { return ");
-                document.insertString(caret.getSelectionEnd(), "}");
+        if (psiElement != null) {
+            String text = psiElement.getText();
+            text = text.replaceFirst("=>", "");
+            if (text.trim().startsWith("(")) {
+                text = "function" + text;
             } else {
-                charSequence = "function" + (params.indexOf('(') != -1 ? params.trim() : "(" + params.trim() + ")");
+                // This should be "functionExpression.ParamList.param.length"
+                int textLength = psiElement.getFirstChild().getFirstChild().getTextLength();
+                text = "function (" + text.substring(0, textLength) + ")" + text.substring(textLength);
             }
-            document.replaceString(selectionStart, arrowGlobalIndex + arrowLength, charSequence);
-        };
-        WriteCommandAction.runWriteCommandAction(project, runnable);
 
-        // Show balloon message
-        StatusBar statusBar = WindowManager.getInstance()
-                .getStatusBar(PlatformDataKeys.PROJECT.getData(event.getDataContext()));
-        JBPopupFactory.getInstance().createHtmlTextBalloonBuilder("Converted arrow function to... non-arrow function?", null, JBColor.CYAN, null)
-                .setFadeoutTime(5500)
-                .createBalloon()
-                .show(RelativePoint.getCenterOf(statusBar.getComponent()),
-                        Balloon.Position.atRight);
+            PsiFile fileFromText = PsiFileFactory.getInstance(project).createFileFromText(text, psiFile);
+
+            PsiElement finalPsiElement = psiElement;
+            Runnable runnable = () -> finalPsiElement.replace(fileFromText.getLastChild());
+            WriteCommandAction.runWriteCommandAction(project, runnable);
+        }
+
+
     }
 
 
     /**
      * This is mostly duplicated, but let's pretend it is not
+     *
      * @param e some action event from which we get the project, data context and file language
      */
     public void update(AnActionEvent e) {
