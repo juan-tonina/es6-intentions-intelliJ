@@ -40,8 +40,14 @@ public class ConvertFromArrow extends AnAction {
 
         if (psiElement != null) {
             String text = psiElement.getText();
-            text = text.replaceFirst("=>", "");
-            if (text.trim().startsWith("(")) {
+
+            if (!text.endsWith("}")) {
+                text = text.replaceFirst("=>", "{ return");
+                text += ";}";
+            } else {
+                text = text.replaceFirst("=>", "");
+            }
+            if (text.startsWith("(")) {
                 text = "function" + text;
             } else {
                 // This should be "functionExpression.ParamList.param.length"
@@ -49,10 +55,12 @@ public class ConvertFromArrow extends AnAction {
                 text = "function (" + text.substring(0, textLength) + ")" + text.substring(textLength);
             }
 
+            text = "a = " + text;
+
             PsiFile fileFromText = PsiFileFactory.getInstance(project).createFileFromText(text, psiFile);
 
             PsiElement finalPsiElement = psiElement;
-            Runnable runnable = () -> finalPsiElement.replace(fileFromText.getLastChild());
+            Runnable runnable = () -> finalPsiElement.replace(fileFromText.getLastChild().getLastChild().getLastChild());
             WriteCommandAction.runWriteCommandAction(project, runnable);
         }
 
