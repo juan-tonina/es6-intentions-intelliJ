@@ -42,11 +42,12 @@ public class ConvertToArrow extends AnAction {
 
             if (text.trim().startsWith("(")) {
                 text = text.replaceFirst("\\)", ") =>");
+                text = "a = " + text;
 
                 PsiFile fileFromText = PsiFileFactory.getInstance(project).createFileFromText(text, psiFile);
 
                 PsiElement finalPsiElement = psiElement;
-                Runnable runnable = () -> finalPsiElement.replace(fileFromText.getLastChild());
+                Runnable runnable = () -> finalPsiElement.replace(fileFromText.getLastChild().getLastChild().getLastChild());
                 WriteCommandAction.runWriteCommandAction(project, runnable);
             }
         }
