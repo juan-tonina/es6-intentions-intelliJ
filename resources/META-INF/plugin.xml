@@ -1,7 +1,7 @@
 <idea-plugin version="2">
     <id>com.juanpany.es6.intentions</id>
     <name>Es6 intentions</name>
-    <version>0.1</version>
+    <version>0.2</version>
     <vendor email="juanf.tonina@gmail.com">Juan</vendor>
 
     <description><![CDATA[
@@ -9,6 +9,9 @@
     ]]></description>
 
     <change-notes><![CDATA[
+    Changes on 0.2:
+    Less robust, but kinda better (now you don't need to select the method, and you can recursively convert to or from arrow functions)
+
       This is a proof of concept, use at your own risk!<br>
       Possible outcomes are: stupid code, broken code, fire, death.<br>
       This first beta version has a simple convert to/from arrow function for javascript files. Put your caret on a function
