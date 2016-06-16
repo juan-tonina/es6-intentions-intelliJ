@@ -13,8 +13,6 @@ import com.intellij.psi.PsiElement;
 import com.intellij.psi.PsiFile;
 import com.intellij.psi.PsiFileFactory;
 
-import java.util.Objects;
-
 public class ConvertToArrow extends AnAction {
     public ConvertToArrow() {
         // Set the menu item name.
@@ -26,10 +24,19 @@ public class ConvertToArrow extends AnAction {
         Project project = event.getData(PlatformDataKeys.PROJECT);
         Caret caret = event.getData(PlatformDataKeys.CARET);
         final Editor editor = event.getData(PlatformDataKeys.EDITOR);
-        Document document = editor.getDocument();
-        PsiFile psiFile = PsiDocumentManager.getInstance(project).getPsiFile(document);
+        Document document = null;
+        if (editor != null) {
+            document = editor.getDocument();
+        }
+        PsiFile psiFile = null;
+        if (project != null && document != null) {
+            psiFile = PsiDocumentManager.getInstance(project).getPsiFile(document);
+        }
 
-        PsiElement psiElement = psiFile.findElementAt(caret.getOffset());
+        PsiElement psiElement = null;
+        if (psiFile != null && caret != null) {
+            psiElement = psiFile.findElementAt(caret.getOffset());
+        }
 
 
         while (psiElement != null && (!psiElement.getText().startsWith("function") || psiElement.getText().equals("function"))) {
@@ -47,8 +54,13 @@ public class ConvertToArrow extends AnAction {
                 PsiFile fileFromText = PsiFileFactory.getInstance(project).createFileFromText(text, psiFile);
 
                 PsiElement finalPsiElement = psiElement;
-                Runnable runnable = () -> finalPsiElement.replace(fileFromText.getLastChild().getLastChild().getLastChild());
-                WriteCommandAction.runWriteCommandAction(project, runnable);
+                Runnable runnable = null;
+                if (fileFromText != null) {
+                    runnable = () -> finalPsiElement.replace(fileFromText.getLastChild().getLastChild().getLastChild());
+                }
+                if (runnable != null) {
+                    WriteCommandAction.runWriteCommandAction(project, runnable);
+                }
             }
         }
 
