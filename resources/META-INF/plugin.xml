@@ -1,7 +1,7 @@
 <idea-plugin version="2">
     <id>com.juanpany.es6.intentions</id>
     <name>Es6 intentions</name>
-    <version>0.2</version>
+    <version>0.2.1</version>
     <vendor email="juanf.tonina@gmail.com">Juan</vendor>
 
     <description><![CDATA[
@@ -9,6 +9,11 @@
     ]]></description>
 
     <change-notes><![CDATA[
+    Changes on 0.2.1:
+    Added "convert to template string", go to  "refactor > convert to template string " and '"something " + someVar' will
+      be replaced with '`something ${someVar}`'. Note that this is still buggy. Adding parenthesis usually solves wrong
+      conversions.
+
     Changes on 0.2:
     Less robust, but kinda better (now you don't need to select the method, and you can recursively convert to or from arrow functions)
 
