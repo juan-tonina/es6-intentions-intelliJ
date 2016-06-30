@@ -1,0 +1,46 @@
+<templateSet group="es6Intentions">
+  <template name="tv" value="${$SELECTION$}" description="${template_variable}" toReformat="false" toShortenFQNames="true">
+    <context>
+      <option name="JAVA_SCRIPT" value="true" />
+    </context>
+  </template>
+  <template name="afunc" value="($PARAMS$) =&gt; {&#10;$CONTENT$$END$&#10;}" description="arrow function" toReformat="true" toShortenFQNames="true">
+    <variable name="PARAMS" expression="" defaultValue="" alwaysStopAt="true" />
+    <variable name="CONTENT" expression="" defaultValue="" alwaysStopAt="true" />
+    <context>
+      <option name="JAVA_SCRIPT" value="false" />
+      <option name="JS_EXPRESSION" value="true" />
+      <option name="JSX_HTML" value="false" />
+      <option name="JS_STATEMENT" value="true" />
+    </context>
+  </template>
+  <template name="litar" value="for (let $INDEX$ = 0; $INDEX$ &lt; $ARRAY$.length; $INDEX$++) {&#10;  let $VAR$ = $ARRAY$[$INDEX$];&#10;  $END$&#10;}" description="Iterate elements of array" toReformat="true" toShortenFQNames="true">
+    <variable name="INDEX" expression="jsSuggestIndexName()" defaultValue="&quot;i&quot;" alwaysStopAt="true" />
+    <variable name="ARRAY" expression="jsArrayVariable()" defaultValue="&quot;array&quot;" alwaysStopAt="true" />
+    <variable name="VAR" expression="jsSuggestVariableName()" defaultValue="&quot;o&quot;" alwaysStopAt="true" />
+    <context>
+      <option name="JS_STATEMENT" value="true" />
+    </context>
+  </template>
+  <template name="ades" value="$var$ [$var1$] = $var2$;" description="array destructuring" toReformat="true" toShortenFQNames="true">
+    <variable name="var" expression="enum(&quot;var&quot;, &quot;let&quot;, &quot;const&quot;)" defaultValue="&quot;let&quot;" alwaysStopAt="true" />
+    <variable name="var1" expression="" defaultValue="" alwaysStopAt="true" />
+    <variable name="var2" expression="jsArrayVariable()" defaultValue="&quot;array&quot;" alwaysStopAt="true" />
+    <context>
+      <option name="JAVA_SCRIPT" value="false" />
+      <option name="JS_EXPRESSION" value="true" />
+      <option name="JSX_HTML" value="true" />
+      <option name="JS_STATEMENT" value="true" />
+    </context>
+  </template>
+  <template name="odes" value="$var$ { $left$ } = $right$;" description="object destructuring" toReformat="true" toShortenFQNames="true">
+    <variable name="var" expression="enum(&quot;var&quot;, &quot;let&quot;, &quot;const&quot;)" defaultValue="&quot;let&quot;" alwaysStopAt="true" />
+    <variable name="left" expression="" defaultValue="" alwaysStopAt="true" />
+    <variable name="right" expression="" defaultValue="&quot;obj&quot;" alwaysStopAt="true" />
+    <context>
+      <option name="JS_EXPRESSION" value="true" />
+      <option name="JSX_HTML" value="true" />
+      <option name="JS_STATEMENT" value="true" />
+    </context>
+  </template>
+</templateSet>

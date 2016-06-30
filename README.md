@@ -1,6 +1,17 @@
 # es6-intentions-intelliJ
 Proof of concept, testing jetbrains plugin development
 
+Version 0.2.2
+
+Minor update, added some live templates under the group "es6Intentions":
+-tv: "${template_variable}"
+-afunc: "arrow function"
+-litar: "Iterate elements of array (same as 'itar', but with 'let' instead of 'var')
+-ades: "array destructuring"
+-odes: "object destructuring"
+
+
+
 Version 0.2.1
 
 This plugin adds refactor options for:

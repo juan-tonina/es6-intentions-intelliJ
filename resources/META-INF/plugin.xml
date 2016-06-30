@@ -1,7 +1,7 @@
 <idea-plugin version="2">
     <id>com.juanpany.es6.intentions</id>
     <name>Es6 intentions</name>
-    <version>0.2.1</version>
+    <version>0.2.2</version>
     <vendor email="juanf.tonina@gmail.com">Juan</vendor>
 
     <description><![CDATA[
@@ -9,19 +9,43 @@
     ]]></description>
 
     <change-notes><![CDATA[
-    Changes on 0.2.1:
+
+    <p>Changes on 0.2.2:</p>
+
+    <p>
+     Added live templates under the group es6Intentions
+
+     <ul>
+     <li>tv: "${template_variable}"
+     </li>
+     <li>afunc: "arrow function"
+     </li>
+     <li>litar: "Iterate elements of array (same as 'itar', but with 'let' instead of 'var')
+     </li>
+     <li>ades: "array destructuring"
+     </li>
+     <li>odes: "object destructuring"
+     </li>
+     </ul>
+    </p>
+
+    <p>Changes on 0.2.1:</p>
+    <p>
     Added "convert to template string", go to  "refactor > convert to template string " and '"something " + someVar' will
       be replaced with '`something ${someVar}`'. Note that this is still buggy. Adding parenthesis usually solves wrong
       conversions.
+      </p>
 
-    Changes on 0.2:
+    <p>Changes on 0.2:</p>
+    <p>
     Less robust, but kinda better (now you don't need to select the method, and you can recursively convert to or from arrow functions)
+    </p>
 
-      This is a proof of concept, use at your own risk!<br>
+      <p>This is a proof of concept, use at your own risk!<br>
       Possible outcomes are: stupid code, broken code, fire, death.<br>
       This first beta version has a simple convert to/from arrow function for javascript files. Put your caret on a function
       or arrow function and go to refactor > convert [to|from] arrow function or press ctrl + alt [+ shift] + a on
-      default windows keymap.<br>
+      default windows keymap.</p>
 
     ]]>
     </change-notes>
@@ -37,7 +61,9 @@
 
     <extensions defaultExtensionNs="com.intellij">
         <!-- Add your extensions here -->
+        <defaultLiveTemplatesProvider implementation="Es6TemplateProvider"/>
     </extensions>
+
 
     <application-components>
         <!-- Add your application components here -->
