@@ -1,7 +1,7 @@
-<idea-plugin version="2">
+<idea-plugin>
     <id>com.juanpany.es6.intentions</id>
     <name>Es6 intentions</name>
-    <version>0.2.2</version>
+    <version>0.2.3</version>
     <vendor email="juanf.tonina@gmail.com">Juan</vendor>
 
     <description><![CDATA[
@@ -9,7 +9,14 @@
     ]]></description>
 
     <change-notes><![CDATA[
-
+    <p>Changes on 0.2.3:</p>
+    <p>
+     Fixed a bug where an unknown file type would cause the plugin to die a horrible death.
+     This was fixed by using the ancient "try all of this and catch any nasty stuff" method
+     </p>
+     <p>
+     Changed all the code to Kotlin, because it is awesome and lovely and cozy.
+     </p>
     <p>Changes on 0.2.2:</p>
 
     <p>
